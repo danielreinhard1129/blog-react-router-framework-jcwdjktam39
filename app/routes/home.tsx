@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 import BlogCard, { type Blog } from "~/components/blog-card";
 import Footer from "~/components/footer";
-import Navbar from "~/components/Navbar";
+import Navbar from "~/components/navbar";
 import { Input } from "~/components/ui/input";
 import type { Route } from "./+types/home";
 
