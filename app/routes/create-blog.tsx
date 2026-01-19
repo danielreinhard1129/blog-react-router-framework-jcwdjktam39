@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, redirect, useNavigate } from "react-router";
 import * as z from "zod";
 import Footer from "~/components/footer";
 import Navbar from "~/components/navbar";
@@ -24,6 +25,7 @@ import {
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import { axiosInstance } from "~/lib/axios";
+import { useAuth } from "~/stores/useAuth";
 
 interface ThumbnailResponse {
   fileURL: string;
@@ -50,7 +52,13 @@ const formSchema = z.object({
   content: z.string().min(1, "Content is required."),
 });
 
+export const clientLoader = () => {
+  const user = useAuth.getState().user;
+  if (!user) return redirect("/login");
+};
+
 export default function CreateBlog() {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,7 +71,11 @@ export default function CreateBlog() {
     },
   });
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+
     try {
       const formData = new FormData();
       formData.append("file", data.thumbnail);
@@ -85,8 +97,11 @@ export default function CreateBlog() {
       });
 
       alert("Blog created successfully!");
+      navigate("/");
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -261,8 +276,13 @@ export default function CreateBlog() {
               />
 
               {/* Submit Button */}
-              <Button type="submit" form="form-create-blog" className="w-full">
-                Publish Blog
+              <Button
+                type="submit"
+                form="form-create-blog"
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? "Loading..." : "Publish Blog"}
               </Button>
             </form>
           </CardContent>
