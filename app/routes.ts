@@ -5,4 +5,5 @@ export default [
   route("/login", "routes/login.tsx"),
   route("/register", "routes/register.tsx"),
   route("/blogs/:objectId", "routes/blog.tsx"),
+  route("/create", "routes/create-blog.tsx"),
 ] satisfies RouteConfig;

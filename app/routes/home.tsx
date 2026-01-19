@@ -20,7 +20,7 @@ export default function Home() {
 
   const getBlogs = async () => {
     try {
-      const { data } = await axiosInstance("/api/data/Blogs");
+      const { data } = await axiosInstance("/api/data/Blogs?sortBy=%60created%60%20desc");
       setBlogs(data);
     } catch (error) {
       console.log(error);
