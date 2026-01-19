@@ -1,10 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
-import BlogCard, { type Blog } from "~/components/blog-card";
+import BlogCard from "~/components/blog-card";
 import Footer from "~/components/footer";
 import Navbar from "~/components/navbar";
 import { Input } from "~/components/ui/input";
 import { axiosInstance } from "~/lib/axios";
+import type { Blog } from "~/types/blog";
 import type { Route } from "./+types/home";
 
 export function meta({}: Route.MetaArgs) {
@@ -15,23 +16,15 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const getBlogs = async () => {
-    try {
-      const { data } = await axiosInstance("/api/data/Blogs?sortBy=%60created%60%20desc");
-      setBlogs(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getBlogs();
-  }, []);
+  const { data: blogs, isPending } = useQuery({
+    queryKey: ["blogs"],
+    queryFn: async () => {
+      const { data } = await axiosInstance<Blog[]>(
+        "/api/data/Blogs?sortBy=%60created%60%20desc",
+      );
+      return data;
+    },
+  });
 
   return (
     <div>
@@ -61,14 +54,14 @@ export default function Home() {
         </div>
 
         {/* Blog Grid */}
-        {isLoading && (
+        {isPending && (
           <div className="flex justify-center items-center h-[40vh]">
             <p>Loading...</p>
           </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {blogs.map((blog) => (
+          {blogs?.map((blog) => (
             <BlogCard key={blog.objectId} blog={blog} />
           ))}
         </div>

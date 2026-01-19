@@ -1,20 +1,7 @@
 import { Link } from "react-router";
-import { Card, CardContent, CardFooter } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-
-export interface Blog {
-  objectId: string;
-  thumbnail: string;
-  author: string;
-  created: number;
-  ___class: string;
-  description: string;
-  title: string;
-  ownerId: string | null;
-  category: string;
-  updated: number;
-  content: string;
-}
+import { Card, CardContent, CardFooter } from "~/components/ui/card";
+import type { Blog } from "~/types/blog";
 
 interface BlogCardProps {
   blog: Blog;
