@@ -1,34 +1,24 @@
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import type { Blog } from "~/components/blog-card";
 import Footer from "~/components/footer";
 import Navbar from "~/components/navbar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { axiosInstance } from "~/lib/axios";
+import type { Blog } from "~/types/blog";
 import type { Route } from "./+types/blog";
 
 export default function Blog({ params }: Route.ComponentProps) {
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const getBlog = async () => {
-    try {
-      const { data } = await axiosInstance(
-        `/api/data/Blogs/${params.objectId}`
+  const { data: blog, isPending } = useQuery({
+    queryKey: ["blog", params.objectId],
+    queryFn: async () => {
+      const { data } = await axiosInstance<Blog>(
+        `/api/data/Blogs/${params.objectId}`,
       );
-      setBlog(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getBlog();
-  }, []);
+      return data;
+    },
+  });
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("en-US", {
@@ -38,7 +28,7 @@ export default function Blog({ params }: Route.ComponentProps) {
     });
   };
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="h-screen flex justify-center items-center">
         <p className="text-2xl font-bold">Loading...</p>

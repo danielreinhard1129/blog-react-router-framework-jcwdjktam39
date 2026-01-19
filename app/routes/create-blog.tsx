@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, redirect, useNavigate } from "react-router";
 import * as z from "zod";
@@ -71,12 +71,8 @@ export default function CreateBlog() {
     },
   });
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  async function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true);
-
-    try {
+  const { mutateAsync: createBlog, isPending } = useMutation({
+    mutationFn: async (data: z.infer<typeof formSchema>) => {
       const formData = new FormData();
       formData.append("file", data.thumbnail);
 
@@ -95,14 +91,18 @@ export default function CreateBlog() {
         thumbnail: response.data.fileURL,
         title: data.title,
       });
-
+    },
+    onSuccess: () => {
       alert("Blog created successfully!");
       navigate("/");
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
+    },
+    onError: () => {
+      alert("Create blog failed!");
+    },
+  });
+
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    await createBlog(data);
   }
 
   return (
@@ -280,9 +280,9 @@ export default function CreateBlog() {
                 type="submit"
                 form="form-create-blog"
                 className="w-full"
-                disabled={isLoading}
+                disabled={isPending}
               >
-                {isLoading ? "Loading..." : "Publish Blog"}
+                {isPending ? "Loading..." : "Publish Blog"}
               </Button>
             </form>
           </CardContent>
