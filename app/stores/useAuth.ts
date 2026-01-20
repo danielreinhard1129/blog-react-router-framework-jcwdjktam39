@@ -2,10 +2,15 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type UserAuth = {
-  objectId: string;
+  id: number;
   name: string;
   email: string;
-  userToken: string;
+  image: string | null;
+  role: string;
+  deletedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  accessToken: string;
 };
 
 type Store = {
@@ -21,6 +26,6 @@ export const useAuth = create<Store>()(
       login: (payload) => set(() => ({ user: payload })),
       logout: () => set(() => ({ user: null })),
     }),
-    { name: "blog-storage" }
-  )
+    { name: "blog-storage" },
+  ),
 );
