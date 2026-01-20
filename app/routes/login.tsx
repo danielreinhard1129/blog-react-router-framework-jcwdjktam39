@@ -13,7 +13,7 @@ import {
 } from "~/components/ui/card";
 import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { axiosInstance } from "~/lib/axios";
+import { axiosInstance2 } from "~/lib/axios";
 import { useAuth } from "~/stores/useAuth";
 
 const formSchema = z.object({
@@ -40,17 +40,12 @@ export default function Login() {
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
-      const response = await axiosInstance.post("/api/users/login", {
-        login: data.email,
+      const response = await axiosInstance2.post("/auth/login", {
+        email: data.email,
         password: data.password,
       });
 
-      login({
-        objectId: response.data.objectId,
-        name: response.data.name,
-        email: response.data.email,
-        userToken: response.data["user-token"],
-      });
+      login(response.data);
 
       navigate("/");
     } catch (error) {
